@@ -2,8 +2,8 @@ def number_file(dir):
 	with open(dir) as f:
 		return sum(1 for _ in f)
 #
-def read_wiki_dic():
-	n_dic = 'wiki_dic_fake.txt'
+def read_wiki_dic(Dic_Name):
+	n_dic = Dic_Name
 	wiki_words = []
 	with open(n_dic , 'r') as file:
 		run = 0
@@ -36,7 +36,7 @@ def PreProRE(word):
 	return word
 		
 def RE_search(title,files):
-	phrase = '<doc.*?title="'+title+'">(?:[^\n]*(\n+))*?<\/doc>'
+	phrase = '<doc.*?title="'+title+'">(?:[^\n]*(\n+))*?<\/doc>\n'
 	for file_name in files:
 		with open(file_name, 'r+') as f:
 			data = mmap.mmap(f.fileno(), 0)
@@ -74,7 +74,7 @@ def search(bi_word,f_en,f_zh):
 	else:
 		print 'Not Found!'
 				
-def read_wiki(Output_Name,Zh_input_folder,En_input_folder):
+def read_wiki(Output_Name,Zh_input_folder,En_input_folder,Dic_Name):
 	print '########Reading Wiki' + ' From file "' + Zh_input_folder + ',' +En_input_folder+'"###########'
 	
 	from os import walk
@@ -95,14 +95,17 @@ def read_wiki(Output_Name,Zh_input_folder,En_input_folder):
 	output_zh = open(Output_Name+'.zh', "wa")
 	output_en = open(Output_Name+'.en', "wa")
 	
-	wiki_words = read_wiki_dic()
+	wiki_words = read_wiki_dic(Dic_Name)
 	#finished read wiki_dic
 	print '###Starting scan page from meta-data###'
 	
+	index_word = 1
 	for bi_word in wiki_words:
 		print 'Next Word!\n[%s,%s]' % (bi_word[0],bi_word[1])
 		contents = search(bi_word,f_en,f_zh)
+		print 'Index_Word(%d)' % index_word
 		print '---------------'
+		index_word += 1
 		#write into file
 		if contents:
 			en_line = contents[0]
@@ -123,13 +126,14 @@ def wiki_sep():
 	import sys
 	import uniout
 	
-	if len(sys.argv) != 4:
-		print 'Usage: python', sys.argv[0], 'Zh-input-folder' , 'En-input-folder' ,'Output-Name'
+	if len(sys.argv) != 5:
+		print 'Usage: python', sys.argv[0], 'Zh-input-folder' , 'En-input-folder' ,'Output-Name','Dic-Name'
 		exit()
 	Zh_input_folder = sys.argv[1]
 	En_input_folder = sys.argv[2]
 	Output_Name = sys.argv[3]
-	read_wiki(Output_Name,Zh_input_folder,En_input_folder)
+	Dic_Name = sys.argv[4]
+	read_wiki(Output_Name,Zh_input_folder,En_input_folder,Dic_Name)
 
 if __name__ == "__main__":
 	wiki_sep()
